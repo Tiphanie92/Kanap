@@ -1,4 +1,4 @@
-const url = "http://localhost:3000/api/products";
+let url = "http://localhost:3000/api/products";
 
 //Récupération des données de l'API avec fetch
 fetch(url)
