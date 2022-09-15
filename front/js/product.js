@@ -1,11 +1,11 @@
 //Création new URL avec urlsearchparams
-let urlParams = window.location.href;
-let newurl = new URL(urlParams);
-let productId = newurl.searchParams.get("id");
-let url = "http://localhost:3000/api/products/" + productId;
+const getProductId = () => {
+  return new URL(location.href).searchParams.get("id");
+};
+const productId = getProductId();
 
 //Récupération des données de l'API
-fetch(url)
+fetch(`http://localhost:3000/api/products/${productId}`)
   .then(function (response) {
     return response.json();
   })
@@ -49,15 +49,17 @@ let registredProducts = (products) => {
       quantity: parseInt(selectQuantity.value, 10),
     };
     let saveProducts = JSON.parse(localStorage.getItem("products"));
+
     if (saveProducts == null) {
       let saveProducts = [];
       saveProducts.push(selectProducts);
       localStorage.setItem("products", JSON.stringify(saveProducts));
       console.log("panier vide,ajout du premier produit");
     } else {
-      const newProducts = saveProducts.find(
-        (cart) =>
-          cart.id == selectProducts.id && cart.color == selectProducts.color
+      let newProducts = saveProducts.find(
+        (newProducts) =>
+          newProducts.id == selectProducts.id &&
+          newProducts.color == selectProducts.color
       );
       if (newProducts == undefined) {
         saveProducts.push(selectProducts);
