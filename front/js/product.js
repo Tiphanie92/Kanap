@@ -39,6 +39,17 @@ let registredProducts = (products) => {
   // Écoute de l'évènement click sur le bouton ajouter
   addToCart.addEventListener("click", (event) => {
     event.preventDefault();
+
+    if (selectColors.value == false) {
+      alert("Veuillez sélectionner une couleur");
+      return selectColors;
+    } else if (selectQuantity.value == 0) {
+      alert("Veuillez sélectionner le nombre d'articles souhaités");
+      return selectQuantity;
+    } else {
+      alert("Votre article a bien été ajouté au panier");
+    }
+
     let selectProducts = {
       id: products._id,
       name: products.name,
@@ -54,7 +65,7 @@ let registredProducts = (products) => {
       let saveProducts = [];
       saveProducts.push(selectProducts);
       localStorage.setItem("products", JSON.stringify(saveProducts));
-      console.log("panier vide,ajout du premier produit");
+      console.log("Panier vide, ajout du premier produit");
     } else {
       let newProducts = saveProducts.find(
         (newProducts) =>
@@ -68,7 +79,7 @@ let registredProducts = (products) => {
       } else {
         newProducts.quantity += selectProducts.quantity;
         localStorage.setItem("products", JSON.stringify(saveProducts));
-        console.log("Quantitées modifiées");
+        console.log("Quantités modifiés");
       }
     }
   });

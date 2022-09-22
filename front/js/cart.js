@@ -1,5 +1,9 @@
-//Récupération du localStorage
+// Récupération des données stockées dans le localStorage
 let saveProducts = JSON.parse(localStorage.getItem("products"));
+let products = [];
+
+//Variable qui récupére la réponse du serveur lors de la requête Post
+let orderId = "";
 
 // Affichage du contenu du panier
 async function displayCart() {
@@ -7,7 +11,8 @@ async function displayCart() {
 
   // Si localstorage vide
   if (saveProducts === null || saveProducts === 0) {
-    console.log("Votre panier est vide");
+    console.log("Aucun produit n'a été ajouté au panier.");
+    return 0;
   } else {
     console.log("Des produits sont présents dans le panier");
   }
@@ -52,7 +57,7 @@ async function displayCart() {
     document.getElementById("totalQuantity").innerHTML = totalQuantity;
     document.getElementById("totalPrice").innerHTML = totalPrice;
   }
-
+  // Appel des fonctions de modification et de supression de produits
   modifyQuantity();
   deleteItem();
 }
@@ -63,7 +68,7 @@ async function ProductId(productId) {
     .then(function (res) {
       return res.json();
     })
-    .catch((err) => {
+    .catch((erreur) => {
       // Erreur serveur
       console.log("erreur");
     })
@@ -88,10 +93,10 @@ function modifyQuantity() {
         }
         return product;
       });
-
+      console.log(saveProducts.quantity);
       // Mise à jour du localStorage
       localStorage.setItem("products", JSON.stringify(saveProducts));
-      // Reactualisation de la page
+      // Raffraichissement de la page
       location.reload();
     });
   });
@@ -111,106 +116,156 @@ function deleteItem() {
       console.log("element supprimées");
       // Mise à jour du localStorage
       localStorage.setItem("products", JSON.stringify(saveProducts));
-      // Reactualisation de la page
+      // Raffraichissement de la page
       location.reload();
     });
   });
 }
+/* LE FORMULAIRE */
+// sélection du bouton Valider
+const order = document.querySelector("#order");
 
-//Formulaire//
-const firstName = document.getElementById("firstName");
-const lastName = document.getElementById("lastName");
-const address = document.getElementById("address");
-const city = document.getElementById("city");
-const email = document.getElementById("email");
+// Écoute du bouton Valider sur le click pour pouvoir valider le formulaire
+order.addEventListener("click", (event) => {
+  event.preventDefault();
 
-let firstNameValue, lastNameValue, addressValue, cityValue, emailValue;
+  //Objet contact pour récupérer les données du formulaire
+  let contact = {
+    firstName: document.querySelector("#firstName").value,
+    lastName: document.querySelector("#lastName").value,
+    address: document.querySelector("#address").value,
+    city: document.querySelector("#city").value,
+    email: document.querySelector("#email").value,
+  };
 
-//Validation champ prénom
-firstName.addEventListener("input", function (event) {
-  firstNameValue;
-  let firstNameError = document.getElementById("firstNameErrorMsg");
-  let firstNameRegExp = /^[a-zA-Z_-]{3,20}$/;
-  if (firstName.valueMissing) {
-    event.preventDefault();
-    firstNameError.textContent = "Veuillez saisir votre prénom.";
-  } else if (firstNameRegExp.test(firstName.value) == false) {
-    event.preventDefault();
-    firstNameError.textContent =
-      "format incorrect,ne pas mettre de chiffre ni d'accent.";
-  } else {
-    event.preventDefault();
-    firstNameError.textContent = "format valide";
-    firstNameError.style.color = "green";
+  console.log(contact);
+
+  // Regex pour validation des champs Prénom, Nom et Ville
+  const regExNoNumber = (value) => {
+    return /^[a-zA-Z_-]{3,20}$/.test(value);
+  };
+
+  // Regex pour validation du champ Adresse
+  const regExAdresse = (value) => {
+    return /^[a-zA-Z0-9.,-_ ]{5,50}[ ]{0,2}$/.test(value);
+  };
+
+  // Regex pour validation du champ Email
+  const regExEmail = (value) => {
+    return /^[a-zA-Z0-9.-_]+[@]{1}[a-zA-Z0-9.-_]+[.]{1}[a-z]{2,4}$/.test(value);
+  };
+
+  // Contrôle du champ Prénom:
+  function firstNameControl() {
+    const firstName = contact.firstName;
+    let firstNameError = document.getElementById("firstNameErrorMsg");
+    if (regExNoNumber(firstName)) {
+      firstNameError.textContent = "Saisie valide";
+      return true;
+    } else {
+      // Message d'erreur si saisie incorrect
+      firstNameError.textContent = "Saisie incorrect,ex: Tiphanie";
+      return false;
+    }
   }
-});
-// Validation champ Nom
-lastName.addEventListener("input", function (event) {
-  lastNameValue;
-  let lastNameError = document.getElementById("lastNameErrorMsg");
-  let lastNameRegExp = /^[a-zA-Z_-]{3,20}$/;
-  if (lastName.valueMissing) {
-    event.preventDefault();
-    lastNameError.textContent = "Veuillez saisir votre nom.";
-  } else if (lastNameRegExp.test(lastName.value) == false) {
-    event.preventDefault();
-    lastNameError.textContent =
-      "format incorrect, ne pas mettre de chiffre ni d'accent.";
-  } else {
-    event.preventDefault();
-    lastNameError.textContent = "format valide";
-    lastNameError.style.color = "green";
+
+  // Contrôle du champ Nom:
+  function lastNameControl() {
+    const lastName = contact.lastName;
+    let lastNameError = document.getElementById("lastNameErrorMsg");
+    if (regExNoNumber(lastName)) {
+      lastNameError.textContent = "Saisie valide";
+      return true;
+    } else {
+      // Message d'erreur si saisie incorrect
+      lastNameError.textContent = "Saisie incorrect, ex: Leblanc";
+      return false;
+    }
   }
-});
-// Validation champ Addresse
-address.addEventListener("input", function (event) {
-  addressValue;
-  let addressError = document.getElementById("addressErrorMsg");
-  let addressRegExp = /((^[0-9]*).?)?((\W+))(([a-z]+.))*$/;
-  if (address.valueMissing) {
-    event.preventDefault();
-    addressError.textContent = "Veuillez saisir votre adresse.";
-  } else if (addressRegExp.test(address.value) == false) {
-    event.preventDefault();
-    addressError.textContent = "format incorrect,trop court";
-  } else {
-    event.preventDefault();
-    addressError.textContent = "format valide";
-    addressError.style.color = "green";
+
+  // Contrôle du champ Adresse:
+  function addressControl() {
+    const adress = contact.address;
+    let addressError = document.getElementById("addressErrorMsg");
+    if (regExAdresse(adress)) {
+      addressError.textContent = "Saisie valide";
+      return true;
+    } else {
+      // Message d'erreur si saisie incorrect
+      addressError.textContent = "Saisie incorrect, ex: 9 rue de la liberté";
+      return false;
+    }
   }
-});
-//Validation champ Ville
-city.addEventListener("input", function (event) {
-  cityValue;
-  let cityError = document.getElementById("cityErrorMsg");
-  let cityRegExp = /^[a-zA-Z_-]{3,20}$/;
-  if (city.valueMissing) {
-    event.preventDefault();
-    cityError.textContent = "Veuillez saisir le nom de votre ville ";
-  } else if (cityRegExp.test(city.value) == false) {
-    event.preventDefault();
-    cityError.textContent =
-      "format incorrect, ne pas mettre de chiffre ni d'accent.";
-  } else {
-    event.preventDefault();
-    cityError.textContent = "format valide";
-    cityError.style.color = "green";
+
+  // Contrôle du champ Ville:
+  function cityControl() {
+    const city = contact.city;
+    let cityError = document.getElementById("cityErrorMsg");
+    if (regExNoNumber(city)) {
+      cityError.textContent = "Saisie valide";
+      return true;
+    } else {
+      // Message d'erreur si saisie incorrect
+      cityError.textContent = "Saisie incorrect, ex: Nice";
+      return false;
+    }
   }
-});
-//Validation champ Email
-email.addEventListener("input", function (event) {
-  emailValue;
-  let emailError = document.getElementById("emailErrorMsg");
-  let emailRegExp = /^[a-zA-Z0-9.-_]+[@]{1}[a-zA-Z0-9.-_]+[.]{1}[a-z]{2,4}$/g;
-  if (email.valueMissing) {
-    event.preventDefault();
-    emailError.textContent = "Veuillez saisir une adresse mail valide.";
-  } else if (emailRegExp.test(email.value) == false) {
-    event.preventDefault();
-    emailError.textContent = "format incorrect, n'oubliez pas le @ et le .";
+
+  // Contrôle du champ Email:
+  function mailControl() {
+    const email = contact.email;
+    let emailError = document.getElementById("emailErrorMsg");
+    if (regExEmail(email)) {
+      emailError.textContent = "Saisie valide";
+      return true;
+    } else {
+      // Message d'erreur si saisie incorrect
+      emailError.textContent = "Saisie incorrect, ex: kanap@contact.com";
+      return false;
+    }
+  }
+
+  // Contrôle du remplissage de tous les champs du formulaire avant de l'envoyer dans le local storage.
+  if (
+    firstNameControl() &&
+    lastNameControl() &&
+    addressControl() &&
+    cityControl() &&
+    mailControl()
+  ) {
+    // Enregistrement dans le local storage
+    localStorage.setItem("contact", JSON.stringify(contact));
+    //Condition pour passer commande
+    if (contact != null && saveProducts != null) {
+      send();
+    } else {
+      alert(
+        "Aucun produit n'est disponible dans le panier, commande impossible"
+      );
+    }
   } else {
-    event.preventDefault();
-    emailError.textContent = "format valide";
-    emailError.style.color = "green";
+    // Message d'alerte si le formulaire n'est pas rempli correctement
+    alert("Veuillez bien remplir le formulaire");
+  }
+
+  // Requête du serveur et Post des données
+  function send() {
+    fetch("http://localhost:3000/api/products/order", {
+      method: "POST",
+      body: JSON.stringify({ contact, products }),
+      headers: {
+        "Content-Type": "application/json",
+      },
+    })
+      .then((response) => {
+        return response.json();
+      })
+      .then((server) => {
+        // Stockage de la réponse de l'API
+        orderId = server.orderId;
+        console.log(orderId);
+        // Renvoie vers la page de confirmation de commande
+        location.href = "confirmation.html?id=" + orderId;
+      });
   }
 });
