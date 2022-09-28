@@ -1,16 +1,13 @@
 // Création d'une nouvelle URL
-const getProductId = () => {
-  return new URL(location.href).searchParams.get("id");
-};
-const orderId = getProductId();
+let params = new URLSearchParams(document.location.search);
+let orderId = params.get("id");
 
 // Récupération des données stockés dans le local storage
-const products = JSON.parse(localStorage.getItem("contact"));
+const products = JSON.parse(localStorage.getItem("contact, products"));
 
 //Affichage du numéro de commande dans le DOM
-document.querySelector("#orderId").innerHTML = `
-    ${orderId}
-    `;
+const order = document.querySelector("#orderId");
+order.textContent = orderId;
 
 //Effacement des données stockés dans le localstorage
 localStorage.clear();
