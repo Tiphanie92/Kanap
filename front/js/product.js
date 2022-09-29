@@ -20,11 +20,8 @@ fetch(`http://localhost:3000/api/products/${productId}`)
 const selectColors = document.querySelector("#colors");
 const selectQuantity = document.querySelector("#quantity");
 const addToCart = document.querySelector("#addToCart");
+
 //Fonction récupération des données
-/**
- *
- * @param {*} products
- */
 let selectProducts = (products) => {
   // Création de nouveaux éléments HTML
   const item = document.querySelector(".item__img");
@@ -53,10 +50,7 @@ let selectProducts = (products) => {
     selectColors.append(colors);
   }
 };
-/**
- *
- * @param {*} products
- */
+// Fonction pour sélection couleur et quantité
 let registredProducts = (products) => {
   // Écoute de l'évènement click sur le bouton ajouter
   addToCart.addEventListener("click", (event) => {

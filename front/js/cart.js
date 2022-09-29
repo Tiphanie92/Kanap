@@ -5,10 +5,6 @@ let products = [];
 let orderId = "";
 
 // Affichage du contenu du panier
-/**
- *
- * @returns 0
- */
 async function cart() {
   // Si localstorage vide, affichage des informations
   if (saveProducts === null || saveProducts === 0) {
@@ -110,11 +106,6 @@ async function cart() {
 }
 
 // Récupération des produits de l'API
-/**
- *
- * @param {*} productId
- * @returns response
- */
 async function productId(productId) {
   return fetch("http://localhost:3000/api/products/" + productId)
     .then(function (res) {
@@ -174,7 +165,7 @@ function deleteItem() {
     });
   });
 }
-console.log(saveProducts);
+
 /* LE FORMULAIRE */
 // sélection du bouton Valider
 const order = document.querySelector("#order");
@@ -200,10 +191,6 @@ order.addEventListener("click", (event) => {
   const emailRegEx = /^[a-zA-Z0-9.-_]+[@]{1}[a-zA-Z0-9.-_]+[.]{1}[a-z]{2,4}$/;
 
   // Contrôle du champ Prénom:
-  /**
-   *
-   * @returns { (true| false) }
-   */
   function firstName() {
     const firstName = contact.firstName;
     let firstNameError = document.getElementById("firstNameErrorMsg");
